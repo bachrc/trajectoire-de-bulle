@@ -11,5 +11,5 @@ Les problèmes à résoudre sont :
 * Décider de la suppresion des points utilisé dans une séquence précédemment déterminée.
 
 Aide :
-https://en.wikipedia.org/wiki/Nearest_neighbor_search
+https://en.wikipedia.org/wiki/Nearest_neighbor_search  
 https://en.wikipedia.org/wiki/Fixed-radius_near_neighbors
