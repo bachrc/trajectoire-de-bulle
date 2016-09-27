@@ -42,3 +42,10 @@ class SampleTest:
                     points_left.remove(point)
                 except ValueError:
                     pass
+
+        for points in candidates:
+            # points is a set of 5 points. If it matches the critera for a
+            # trajectory given the current parameters (tolerance, angle), add
+            # it to trajectories. This test's score is the number of valid
+            # trajectories it managed to find.
+            pass
