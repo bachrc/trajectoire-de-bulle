@@ -1,0 +1,59 @@
+Approche analytique de l'identification de quintuplet valide
+-------------------------------------------------------------
+
+PourcentageMax = 0
+AngleMax = 0
+
+#Determination des constantes PourcentageMax et AngleMax à partir des trajectoire d'apprentissage
+SI collectionApprentissage != NULL && collectionApprentissage isNot VIDE
+	POUR CHAQUE Quintuplet Q IN collectionApprentissage
+		distanceNorm = distanceMoyenne(Q)
+
+		POUR i = 0; i < 4; i++
+			SI i != 2
+				Marge = absolue((distanceNorm - distance(Q[i],Q[i+1]))/distanceNorm)
+			SINON
+				Marge = absolue((distanceNorm - distance(Q[i],Q[i+1])/2)/distanceNorm)
+			FSI
+			Angle = calcAngle(Q[i],Q[i+1])
+			
+			SI Marge > PourcentageMax
+				PourcentageMax = marge
+			FSI
+			
+			SI Angle > AngleMax
+				AngleMax = Angle
+			FSI
+		FPOUR
+		
+	FPOUR
+SINON
+	PourcentageMax = POURCENTAGE_DEFAUT
+	AngleMax = ANGLE_DEFAUT
+FSI
+
+#Identification d'un quintuplet comme étant une trajectoire
+POUR CHAQUE Quintuplet Q IN collectionQuintuplet
+	distanceNorm = distanceMoyenne(Q)
+	valide = VRAI
+
+	
+	POUR i = 0; i < 4 && valide; i++
+		SI i != 2
+			valide = absolue((distanceNorm - distance(Q[i],Q[i+1]))/distanceNorm) <= PourcentageMax
+		SINON
+			valide = absolue((distanceNorm - distance(Q[i],Q[i+1])/2)/distanceNorm) <= PourcentageMax
+		FSI
+		
+		SI valide
+			valide =  calcAngle(Q[i],Q[i+1]) <= AngleMax
+		FSI
+	FPOUR
+	
+	SI valide
+		collectionTrajectoirePossible.add(Q)
+	FSI
+	
+FPOUR
+
+#Manque les méthode distance, distance moyenne et calcangle
