@@ -1,17 +1,13 @@
-from random import choice
 import numpy as np
 import math as m
-
-
-def unit_vector(vector):
-    return vector / np.linalg.norm(vector)
 
 
 def angle(v1, v2):
     v1 /= np.linalg.norm(v1)
     v2 /= np.linalg.norm(v2)
     angle_rad = np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
-    return abs(180.0 * angle_rad / m.pi)
+    angle_deg = 180.0 * angle_rad / m.pi
+    return angle_deg if angle_deg < 90 else 180 - angle_deg
 
 
 class SampleTest:
@@ -25,52 +21,7 @@ class SampleTest:
     def score(self):
         return len(self.trajectories)
 
-    def perform(self):
-        self.find_trajectories(self.find_candidates())
-
-    def find_candidates(self):
-        points_left = [p for p in self.pset.points]
-        candidates = []
-
-        while len(points_left) > 0:
-            # Pick a point to start with, find its nearest neighbour, and
-            # compute the associated radius for the remainder of the process.
-            start = points_left.pop()
-            nearest = self.pset.nearest(start)
-            radius = start.distance(nearest)
-
-            # True: the point has been explored. False: it hasn't. Keep
-            # expanding the subset until we've found 5 points.
-            subset = {start: True, nearest: False}
-            while len(subset) < 5 and not all(subset.values()):
-                # Pick an unexplored point, explore it.
-                base = choice([k for k in subset if not subset[k]])
-                subset[base] = True
-                for neighbour in self.pset.neighbours(base, radius):
-                    if neighbour not in subset:
-                        subset[neighbour] = False
-
-            subset = list(subset.keys())
-            if len(subset) < 5:
-                # The point appears to be isolated.
-                continue
-
-            if len(subset) > 5:
-                # Too many points, we might have a trajectory conflict. Let's
-                # keep the points closest to our starting point.
-                subset = sorted(subset, key=lambda p: p.distance(start))[:5]
-
-            # Save the subset and its search radius for further processing.
-            candidates.append({'radius': radius, 'points': subset})
-            for point in subset:
-                try:
-                    points_left.remove(point)
-                except ValueError:
-                    pass
-
-        return candidates
-
-    def find_trajectories(self, candidates):
+    def perform(self, candidates):
         for candidate in candidates:
             points = candidate['points']
 
@@ -88,42 +39,58 @@ class SampleTest:
             dys = [p1.y - p2.y for p1, p2 in pys if p1 != p2]
             dzs = [p1.z - p2.z for p1, p2 in pzs if p1 != p2]
 
-            # Note that trajectories might have more than one orientation, but
-            # sorting is merely here to help construct a valid slope.
-            # TODO: try and check all valid orientations?
-            if all(d == dxs[0] for d in dxs[1:]):
+            # First, let's determine the planes in which the trajectory is
+            # perceptible.
+            orientations = {}
+            if all(np.sign(d) == np.sign(dxs[0]) for d in dxs[1:]):
                 # Trajectory has an x-axis orientation.
-                points.sort(key=lambda p: p.x)
-            elif all(d == dys[0] for d in dys[1:]):
-                # Trajectory has an z-axis orientation.
-                points.sort(key=lambda p: p.y)
-            elif all(d == dzs[0] for d in dzs[1:]):
-                # Trajectory has an y-axis orientation.
-                points.sort(key=lambda p: p.z)
-            else:
-                # Trajectory doesn't appear to be oriented, forget it.
-                continue
+                orientations['x'] = sorted(points, key=lambda p: p.x)
+            if all(np.sign(d) == np.sign(dys[0]) for d in dys[1:]):
+                # Trajectory has a y-axis orientation.
+                orientations['y'] = sorted(points, key=lambda p: p.y)
+            if all(np.sign(d) == np.sign(dzs[0]) for d in dzs[1:]):
+                # Trajectory has a z-axis orientation.
+                orientations['z'] = sorted(points, key=lambda p: p.z)
 
-            # With the points in a consecutive order, we can compute the slopes.
-            slopes = [(points[i].x - points[i+1].x,
-                       points[i].y - points[i+1].y,
-                       points[i].z - points[i+1].z) for i in range(4)]
-            # Now the angles...
-            angles = [angle(slopes[i], slopes[i+1]) for i in range(4)]
-            # And the distances... (excluding the 3rd distance)
-            distances = [points[i].distance(points[i+1]) for i in range(4)
-                         if i != 2]
+            # Determine which planes we have to check.
+            axes = list(orientations.keys())
+            plane_checks = [(axes[i], axes[j])
+                            for i in range(len(axes))
+                            for j in range(i, len(axes))
+                            if axes[i] != axes[j]]
+
+            # With the points in a consecutive order, we can compute the slopes
+            # and angles in each plane.
+            angles = []
+            distances = []
+
+            for a1, a2 in plane_checks:
+                slopes = []
+                for i in range(4):
+                    p1 = {'x': orientations[a1][i].x,
+                          'y': orientations[a1][i].y,
+                          'z': orientations[a1][i].z}
+                    p2 = {'x': orientations[a1][i+1].x,
+                          'y': orientations[a1][i+1].y,
+                          'z': orientations[a1][i+1].z}
+
+                    slopes.append((p1[a1] - p2[a1], p1[a2] - p2[a2]))
+
+                angles += [angle(slopes[i], slopes[i+1]) for i in range(3)]
+                for plane in a1, a2:
+                    for i in range(4):
+                        p1 = orientations[plane][i]
+                        p2 = orientations[plane][i+1]
+                        d = p1.distance(p2)
+                        distances.append(d if i != 2 else d / 2.0)
 
             # Determine the acceptable range for distances.
-            radius_min = (1 - self.tolerance) * candidate['radius']
-            radius_max = (1 + self.tolerance) * candidate['radius']
+            distance_max = (1 + self.tolerance) * candidate['radius']
 
             # Test everything!
             valid_angles = all(a <= self.angle for a in angles)
-            valid_distances = all(radius_min <= d <= radius_max
-                                  for d in distances)
-            valid_3rd = radius_min <= distances[2] / 2.0 <= radius_max
+            valid_distances = all(d <= distance_max for d in distances)
 
-            if valid_angles and valid_distances and valid_3rd:
+            if valid_angles and valid_distances:
                 # The 5 points appear to form a valid trajectory. Score +1!
                 self.trajectories.append(points)

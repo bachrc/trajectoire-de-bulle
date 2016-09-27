@@ -3,14 +3,16 @@ from parser import PointSet
 from glob import glob
 
 if __name__ == '__main__':
+    #for filename in glob('data/points/valid_sample.txt'):
     for filename in glob('data/points/norma_*.txt'):
         tests = {}
         points = PointSet(filename)
+        candidates = points.find_trajectory_candidates()
 
         for tolerance in range(5, 25, 5):
             for angle in reversed(range(10, 50, 5)):
-                test = SampleTest(points, tolerance, angle)
-                test.perform()
+                test = SampleTest(points, tolerance / 100.0, angle)
+                test.perform(candidates)
 
                 if tolerance not in tests:
                     tests[tolerance] = {}
@@ -21,5 +23,6 @@ if __name__ == '__main__':
                         key=lambda p: tests[p[0]][p[1]].score)
         best = tests[best_keys[0]][best_keys[1]]
 
-        print("%d points, best tolerance is %d%%, best angle is %d°." % (
-            points.size, best.tolerance, best.angle))
+        print("%d points, %d trajectories, best tolerance is %d%%, "
+              "best angle is %d°." % (points.size, best.score,
+                                      best.tolerance * 100.0, best.angle))

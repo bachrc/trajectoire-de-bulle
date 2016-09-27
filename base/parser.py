@@ -40,13 +40,56 @@ class PointSet:
         return len(self.points)
 
     def nearest(self, ref):
-        return min(self.points, key=lambda p: p.distance(ref))
+        return min((p for p in self.points if p != ref),
+                   key=lambda p: p.distance(ref))
 
     def neighbours(self, ref, radius):
         neighbours = []
-        for point in self.points:
+        for point in (p for p in self.points if p != ref):
             if abs(point.x - ref.x) <= radius and \
                abs(point.y - ref.y) <= radius and \
                abs(point.z - ref.z) <= radius:
                 neighbours.append(point)
         return neighbours
+
+    def find_trajectory_candidates(self):
+        points_left = [p for p in self.points]
+        candidates = []
+
+        while len(points_left) > 0:
+            # Pick a point to start with, find its nearest neighbour, and
+            # compute the associated radius for the remainder of the process.
+            start = points_left.pop()
+            nearest = self.nearest(start)
+            radius = start.distance(nearest)
+
+            # True: the point has been explored. False: it hasn't. Keep
+            # expanding the subset until we've found 5 points.
+            subset = {start: True, nearest: False}
+            while len(subset) < 5 and not all(subset.values()):
+                # Pick an unexplored point, explore it.
+                base = [k for k in subset if not subset[k]][0]
+                subset[base] = True
+                for neighbour in self.neighbours(base, radius):
+                    if neighbour not in subset.keys():
+                        subset[neighbour] = False
+
+            subset = list(subset.keys())
+            if len(subset) < 5:
+                # The point appears to be isolated.
+                continue
+
+            if len(subset) > 5:
+                # Too many points, we might have a trajectory conflict. Let's
+                # keep the points closest to our starting point.
+                subset = sorted(subset, key=lambda p: p.distance(start))[:5]
+
+            # Save the subset and its search radius for further processing.
+            candidates.append({'radius': radius, 'points': subset})
+            for point in subset:
+                try:
+                    points_left.remove(point)
+                except ValueError:
+                    pass
+
+        return candidates
