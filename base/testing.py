@@ -1,27 +1,44 @@
-from elements import TrajectoryTree
 from random import choice
 
 
 class SampleTest:
-    def __init__(self, points, tolerance, angle):
-        self.eligible = points.shallow_copy()
+    def __init__(self, pset, tolerance, angle):
+        self.pset = pset
         self.tolerance = tolerance
         self.angle = angle
         self.trajectories = []
 
-    def perform(self):
-        while len(self.eligible) != 0:
-            root = choice(self.eligible)
-            builder = TrajectoryTree(root)
-            trajectory = builder.build_trajectory()
-
-            if trajectory is not None:
-                self.trajectories.append(trajectory)
-                for point in trajectory:
-                    self.eligible.remove(point)
-            else:
-                self.eligible.remove(root)
-
     @property
     def score(self):
         return len(self.trajectories)
+
+    def perform(self):
+        points_left = [p for p in self.pset.points]
+        candidates = []
+
+        while len(points_left) > 0:
+            start = points_left.pop()
+            nearest = self.pset.nearest(start)
+            radius = start.distance(nearest)
+
+            subset = {start: True, nearest: False}
+            while len(subset) < 5 and not all(subset.values()):
+                base = choice([k for k in subset if not subset[k]])
+                subset[base] = True
+                for neighbour in self.pset.neighbours(base, radius):
+                    if neighbour not in subset:
+                        subset[neighbour] = False
+
+            subset = list(subset.keys())
+            if len(subset) < 5:
+                continue
+
+            if len(subset) > 5:
+                subset = sorted(subset, key=lambda p: p.distance(start))[:5]
+
+            candidates.append(subset)
+            for point in subset:
+                try:
+                    points_left.remove(point)
+                except ValueError:
+                    pass
