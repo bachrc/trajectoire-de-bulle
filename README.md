@@ -3,18 +3,10 @@ Projet visant à déterminer les trajectoires de bulles à partir d'un fichier d
 
 Rappel du problème : Différentes position sont obtenus par un faisceau laser qui rebondit sur des particules, nous donnant alors leur positions en x, y et z dans un repère donnée. En ayant à notre disposition l'ensemble des différentes positions et leur coordonnées sous la forme d'un fichier, nous devons détecter la trajectoires prise par une particules. Ces particules sont prises dans un tourbillon (c'est son comportement que nous cherchons à étudier), leurs trajectoires seront donc courbes.
 
-## Approche itérative
+## Approche Analytique
 ---
 
-L'approche itérative consiste à tester les points sucessevivement avec leurs "voisins" pour en dégager une séquence 
-selon les données qui définnissent la séquence.
+L'approche analutique consiste à vérifier que les quintuplets répondent à des conditions spécifiques pour estimer que ce sont de possible trajectoire. Pour ca, on vérifie :
 
-Les problèmes à résoudre sont :
-* La détermination des points voisins d'un point donné pour débuter l'identification d'une séquence
-* La modularité des boucles pour accepter différentes sortes de séquence
-* Décider comment gérer "le début d'une séquence"
-* Décider de la suppresion des points utilisé dans une séquence précédemment déterminée.
-
-Aide :  
-https://en.wikipedia.org/wiki/Nearest_neighbor_search  
-https://en.wikipedia.org/wiki/Fixed-radius_near_neighbors
+  -Que les distances entre les points correspondent à une distance moyenne + ou - un seuil de tolérance.
+  -Que l'angle entre les points ne dépasse pas une valeur donnée.
