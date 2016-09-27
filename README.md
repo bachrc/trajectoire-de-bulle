@@ -15,3 +15,10 @@ Deux visions sont possibles :
  Dans le second cas, les paramètres d'entrée et de sortie ne forme qu'un unique ensemble et on cherche à relié les points entre-eux pour définir ainsi des ensembles qui seront nos trajectoires.
  
  Il est important de rappeler les différents avantages et inconvénients inhérent au Réseau de neurones. Il s'agit d'une technique possédant une grande fiabilité et une assez bonne plasticité d'execution. De plus, les réseau de neurones ne demande qu'un temps d'execution minimal à l'execution. Les mauvais points sont principalement le manque de compréhension interne : Un réseau de neurones fonctionne mais on ne saurait expliquer clairement (autrement qu'avec des mathématiques) comment. A cela s'ajoute qu'un réseau de neurones ne fonctionne que pour les cas auxquelles il est destiné, de par son design il est difficile de le faire évoluer, c'est la rançon de sa fiabilité. Enfin, il est nécessaire d'entraîner un réseau de neurones, cela correspond à la rançon de son efficacité puisque cet entrainement est êxtremement long en comparaison de son temps d'execution future.
+
+
+EDIT 27/09/16 : Après réflexion on utilisera une approche neuronal pour identifier si un ensemble de point est bien une trajectoire. L'ensemble de point sera fournis par une méthode d'exploration optimisé.
+
+On dévellope donc un réseau de neurones ayant d\*n neurones d'entrée et deux neurones de sorties avec d le nombre de dimention de l'espace (ici 3) et n le nombre de point d'une séquence (ici 5). Le but du réseau est de dire si oui ou non un ensemble de point est une trajectoire.
+
+Un élément important de l'approche réside dans l'ordre des points. Doit-on faire en sorte de reconnaître une trajectoire peut importe l'ordre dans lequel on va passer les points ou l'ordre a-t-il une important ?
