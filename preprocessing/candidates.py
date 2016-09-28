@@ -6,6 +6,12 @@ class Candidate:
         self.points = points
         self.radius = radius
 
+    def __repr__(self):
+        return ", ".join(p.__repr__() for p in self.points)
+
+    def matches(self, points):
+        return all(p in self.points for p in points)
+
 
 class CandidateSearch:
     def __init__(self, pset):
@@ -14,7 +20,7 @@ class CandidateSearch:
 
     def iterate(self):
         if len(self.left) == 0:
-            self.left = deque([p for p in self.pset.points])
+            self.left = deque([p for p in self.pset.points.values()])
 
         while len(self.left) > 0:
             # Pick a point to start with, find its nearest neighbour, and

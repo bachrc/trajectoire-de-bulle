@@ -24,31 +24,58 @@ class Point:
         return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __repr__(self):
-        return "(%f ; %f ; %f)" % (self.x, self.y, self.z)
+        return "(%f, %f, %f)" % (self.x, self.y, self.z)
 
 
 class PointSet:
     def __init__(self, filename):
-        self.points = []
+        self.points = {}
+        next_id = 1
+
         with open(filename) as resource:
             for line in resource:
                 x, y, z = [float(s) for s in line.strip().split()[:3]]
-                self.points.append(Point(x, y, z))
+                self.points[next_id] = Point(x, y, z)
+                next_id += 1
 
     @property
     def size(self):
         return len(self.points)
 
+    def get_by_id(self, point_id):
+        try:
+            return self.points[point_id]
+        except KeyError:
+            return None
+
     def nearest(self, ref):
-        return min((p for p in self.points if p != ref),
+        return min((p for p in self.points.values() if p != ref),
                    key=lambda p: p.distance(ref))
 
     def neighbours(self, ref, radius):
         neighbours = []
-        for point in (p for p in self.points if p != ref):
+        for point in (p for p in self.points.values() if p != ref):
             if abs(point.x - ref.x) <= radius and \
                abs(point.y - ref.y) <= radius and \
                abs(point.z - ref.z) <= radius:
                 neighbours.append(point)
         return neighbours
 
+
+class LearningBase:
+    def __init__(self, pset, trajectory_file):
+        self.pset = pset
+        self.trajectories = []
+
+        with open(trajectory_file) as resource:
+            for line in resource:
+                point_ids = [int(i) for i in line.strip().split()]
+                trajectory = [self.pset.get_by_id(i) for i in point_ids]
+
+                if any(p is None for p in trajectory):
+                    continue
+
+                self.trajectories.append(trajectory)
+
+    def known_valid(self, candidate):
+        return any(candidate.matches(t) for t in self.trajectories)
