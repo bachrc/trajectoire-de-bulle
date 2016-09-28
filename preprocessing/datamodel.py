@@ -67,18 +67,20 @@ class PointSet:
 class LearningSet:
     def __init__(self, pset, trajectory_file):
         self.pset = pset
-        self.resource = open(trajectory_file)
+        self.trajectory_file = trajectory_file
 
     def iterate(self):
-        for line in self.resource:
-            point_ids = [int(i) for i in line.strip().split()]
-            trajectory = [self.pset.get_by_id(i) for i in point_ids]
+        with open(self.trajectory_file) as resource:
+            for line in resource:
+                point_ids = [int(i) for i in line.strip().split()]
+                trajectory = [self.pset.get_by_id(i) for i in point_ids]
 
-            if any(p is None for p in trajectory):
-                continue
+                if any(p is None for p in trajectory):
+                    continue
 
-            dists = [trajectory[i].distance(trajectory[i+1]) for i in range(4)]
-            d_max = max(dists)
-            dists = [d_max / 2 if d == d_max else d for d in dists]
+                dists = [trajectory[i].distance(trajectory[i+1])
+                         for i in range(4)]
+                d_max = max(dists)
+                dists = [d_max / 2.0 if d == d_max else d for d in dists]
 
-            yield Candidate(trajectory, max(dists)).to_standard_order()
+                yield Candidate(trajectory, max(dists)).to_standard_order()
