@@ -17,6 +17,24 @@ class GUI:
         self.fig = p.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
 
+        self.lines = []
+
+    def add_trajectory(self, trajectory, refresh=False):
+        self.trajectories.append(trajectory)
+        if refresh:
+            p.draw()
+
+    def add_bubbles(self, bubble, refresh=False):
+        self.bubbles.append(bubble)
+        if refresh:
+            p.draw()
+
+    def set_bubbles(self, new_bubbles):
+        self.bubbles = new_bubbles
+
+    def set_trajectories(self, new_trajectories):
+        self.trajectories = new_trajectories
+
     def display(self):
         """
         Méthode affichant les points restés en mémoire.
@@ -24,7 +42,7 @@ class GUI:
         """
 
         for bubble in self.bubbles:
-            self.ax.scatter([bubble[0]], [bubble[1]], [bubble[2]], c='b', marker='o', picker=5)
+            self.ax.scatter([bubble[0]], [bubble[1]], [bubble[2]], c='#0099cc', marker='o', picker=5)
 
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
 
@@ -36,35 +54,21 @@ class GUI:
 
         trajectories = [coordinates for coordinates in self.trajectories if (x[ind], y[ind], z[ind]) in coordinates]
 
+        del self.ax.lines[:]
+
         if len(trajectories) > 0:
             for i in range(4):
-                self.ax.plot([trajectories[0][i][0], trajectories[0][i+1][0]], [trajectories[0][i][1], trajectories[0][i+1][1]], zs=[trajectories[0][i][2], trajectories[0][i+1][2]])
+                self.lines.append(self.ax.plot([trajectories[0][i][0], trajectories[0][i+1][0]],
+                                               [trajectories[0][i][1], trajectories[0][i+1][1]],
+                                               zs=[trajectories[0][i][2], trajectories[0][i+1][2]]))
 
+        print(self.ax.lines)
         p.draw()
 
         print(x[ind], y[ind], z[ind])
 
 
 if __name__ == '__main__':
-    """
-    fig = p.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    ax.scatter([1], [0], [0], c='r', marker='^', picker=5)
-    ax.scatter([0], [1], [0], c='g', marker='^', picker=5)
-    ax.scatter([0], [0], [1], c='b', marker='^', picker=5)
-
-    ax.plot([1, 0], [0, 1], zs=[0, 0])
-
-    def onpick(event):
-        ind = event.ind[0]
-        x, y, z = event.artist._offsets3d
-        print(x[ind], y[ind], z[ind])
-
-    fig.canvas.mpl_connect('pick_event', onpick)
-
-    p.show()
-    """
 
     bubbles = [(0, 0, 1), (1, 0, 0), (0, 2, 1), (1, 3, 0), (2, 0, 1), (3, 2, 1), (1, 2, 3), (0, 0, 0)]
     trajectories = [((0, 0, 1), (0, 2, 1), (2, 0, 1), (1, 2, 3), (3, 2, 1)),
