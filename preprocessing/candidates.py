@@ -1,4 +1,5 @@
 from collections import deque
+from itertools import permutations
 
 
 class Candidate:
@@ -11,6 +12,12 @@ class Candidate:
 
     def matches(self, points):
         return all(p in self.points for p in points)
+
+    def to_standard_order(self):
+        self.points = min(permutations(self.points),
+                          key=lambda p: sum([p[i].distance(p[i+1])
+                                             for i in range(4)]))
+        return self
 
 
 class CandidateSearch:
@@ -51,7 +58,7 @@ class CandidateSearch:
                 # keep the points closest to our starting point.
                 subset = sorted(subset, key=lambda p: p.distance(start))[:5]
 
-            yield Candidate(subset, radius)
+            yield Candidate(subset, radius).to_standard_order()
 
     def report_positive(self, candidate):
         for point in candidate.points:
