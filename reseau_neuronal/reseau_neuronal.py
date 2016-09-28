@@ -1,23 +1,24 @@
 import neurolab as nl
 
 
-class NeuralNetwork():
+class NeuralNetwork:
 
-    def __init__(self):
-        """
-        N'utiliser ce constructeur que si vous êtes sur qu'il existe un fichier
-        contenant le réseau
-        """
-        self.network = nl.load('network.net')
-
-    def __init__(self, matrice_input: list, vector_output: list):
+    def __init__(self, matrice_input: list = None, vector_output: list = None):
         """
         Ce constructeur entrainera le réseau en plus de le crée. Ne l'utilisez que si vous êtes sur
         que vosu ne possèdez pas déjà un réseau dans un fichier.
         :param matrice_input: Matrice dont chaque ligne est une trajectoire à tester
         :param vector_output: Vecteur dont chaque valeur est une sortie attendus
         """
-        self.init_reseau(matrice_input, vector_output)
+
+        if matrice_input == None and vector_output == None:
+            self.network = nl.load('network.net')
+
+        elif matrice_input != None and vector_output != None:
+            self.init_reseau(matrice_input, vector_output)
+
+        else:
+            raise ValueError('Vous ne pouvez pas passer un vecteur null et uen matrice non-null et vice-versa')
 
     def init_reseau(self, matrice_input: list, vector_output: list):
         """
