@@ -1,10 +1,16 @@
-from testing import SampleTest
-from parser import PointSet
+from preprocessing.datamodel import PointSet
+from enumerative.testing import SampleTest
+
 from glob import glob
 
 if __name__ == '__main__':
-    for filename in glob('data/points/valid_sample.txt'):
-    #for filename in glob('data/points/norma_*.txt'):
+    datafiles = glob('../datasets/points/norma_*.txt')
+
+    # If you want to run a test on a small (5 points) sample, use this. The
+    # points in that file DO FORM a trajectory.
+    # datafiles = ["../datasets/points/valid_sample.txt"]
+
+    for filename in datafiles:
         tests = {}
         points = PointSet(filename)
 
