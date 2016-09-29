@@ -1,10 +1,23 @@
 from collections import deque
+from itertools import permutations
 
 
 class Candidate:
     def __init__(self, points, radius):
         self.points = points
         self.radius = radius
+
+    def __repr__(self):
+        return ", ".join(p.__repr__() for p in self.points)
+
+    def matches(self, points):
+        return all(p in self.points for p in points)
+
+    def to_standard_order(self):
+        self.points = min(permutations(self.points),
+                          key=lambda p: sum([p[i].distance(p[i+1])
+                                             for i in range(4)]))
+        return self
 
 
 class CandidateSearch:
@@ -14,7 +27,7 @@ class CandidateSearch:
 
     def iterate(self):
         if len(self.left) == 0:
-            self.left = deque([p for p in self.pset.points])
+            self.left = deque([p for p in self.pset.points.values()])
 
         while len(self.left) > 0:
             # Pick a point to start with, find its nearest neighbour, and
@@ -45,7 +58,7 @@ class CandidateSearch:
                 # keep the points closest to our starting point.
                 subset = sorted(subset, key=lambda p: p.distance(start))[:5]
 
-            yield Candidate(subset, radius)
+            yield Candidate(subset, radius).to_standard_order()
 
     def report_positive(self, candidate):
         for point in candidate.points:
