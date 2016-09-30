@@ -1,15 +1,20 @@
+from preprocessing.candidates import CandidateSearch
+
+from itertools import permutations
 import numpy as np
 import math as m
-from itertools import permutations
-
-from preprocessing.candidates import CandidateSearch
 
 
 def angle(v1, v2):
-    # TODO: not sure this is the angle we're interested in. Try a projection?
-    v1 /= np.linalg.norm(v1)
-    v2 /= np.linalg.norm(v2)
-    return 180.0 * np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0)) / m.pi
+    angles = []
+    for c1, c2 in (p for p in permutations(range(3), 2) if p[0] < p[1]):
+        u = (v1[c1], v1[c2])
+        v = (v2[c1], v2[c2])
+        angle_cos = np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
+        angle_deg = abs(180.0 * np.arccos(angle_cos) / m.pi)
+        angles.append(180.0 - angle_deg if angle_deg > 90 else angle_deg)
+
+    return sum(angles) / len(angles)
 
 
 class SampleTest:
