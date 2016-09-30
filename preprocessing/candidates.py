@@ -48,7 +48,7 @@ class CandidateSearch:
 
             # True: the point has been explored. False: it hasn't. Keep
             # expanding the subset until we've found 5 points.
-            subset = {start: True, nearest: False}
+            subset = {start: False, nearest: False}
             while len(subset) < 5 and not all(subset.values()):
                 # Pick an unexplored point, explore it.
                 base = [k for k in subset if not subset[k]][0]
