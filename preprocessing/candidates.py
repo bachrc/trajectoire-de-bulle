@@ -1,4 +1,3 @@
-from collections import deque
 from itertools import permutations
 
 
@@ -21,20 +20,31 @@ class Candidate:
 
 
 class CandidateSearch:
-    def __init__(self, pset):
-        self.pset = pset
-        self.left = deque()
+    def __init__(self, pset, radius_flex=2):
+        self.pset_bak = pset
+        self.pset = None
+        self.radius_flex = radius_flex
+        self.banned_starts = set()
 
     def iterate(self):
-        if len(self.left) == 0:
-            self.left = deque([p for p in self.pset.points.values()])
+        if self.pset is None:
+            self.pset = self.pset_bak.copy()
 
-        while len(self.left) > 0:
-            # Pick a point to start with, find its nearest neighbour, and
-            # compute the associated radius for the remainder of the process.
-            start = self.left.popleft()
+        while self.pset.size() > len(self.banned_starts):
+            # Pick a point to start with, and make sure we don't come back
+            # twice. This process stops when all possible starts have been
+            # exhausted.
+            start = next(self.pset.pop_iterate())
+            if start in self.banned_starts:
+                self.pset.push_back(start)
+                continue
+            self.banned_starts.add(start)
+
+            # Find the nearest neighbour, and compute a search radius.
             nearest = self.pset.nearest(start)
-            radius = start.distance(nearest)
+            if nearest is None:
+                continue
+            search_radius = start.distance(nearest) * self.radius_flex
 
             # True: the point has been explored. False: it hasn't. Keep
             # expanding the subset until we've found 5 points.
@@ -43,26 +53,35 @@ class CandidateSearch:
                 # Pick an unexplored point, explore it.
                 base = [k for k in subset if not subset[k]][0]
                 subset[base] = True
-                for neighbour in self.pset.neighbours(base, radius):
+                for neighbour in self.pset.neighbours(base, search_radius):
                     if neighbour not in subset.keys():
                         subset[neighbour] = False
 
             subset = list(subset.keys())
             if len(subset) < 5:
-                # The point appears to be isolated. Ignore it.
-                # TODO: we can try and come back to it (right now, that fails).
+                # Starting from here wasn't interesting, but this point can
+                # still come up as useful as part of a trajectory once other
+                # candidate have been ruled out. We'll push it back.
+                self.pset.push_back(start)
                 continue
 
             if len(subset) > 5:
-                # Too many points, we might have a trajectory conflict. Let's
-                # keep the points closest to our starting point.
-                subset = sorted(subset, key=lambda p: p.distance(start))[:5]
+                # Too many points, we might have a trajectory conflict. We used
+                # to keep the points closest to the start, but it turns out
+                # using a point-to-line distance also helps keep a descent
+                # trajectory axis.
+                subset = sorted(subset,
+                                key=lambda p:
+                                p.distance_to_line(start, nearest))[:5]
 
-            yield Candidate(subset, radius).to_standard_order()
+            yield Candidate(subset, search_radius).to_standard_order()
+
+        self.pset = None
 
     def report_positive(self, candidate):
         for point in candidate.points:
             try:
-                self.left.remove(point)
-            except ValueError:
+                self.pset.remove(point)
+                self.banned_starts.remove(point)
+            except (ValueError, KeyError):
                 pass
