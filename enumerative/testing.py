@@ -16,6 +16,17 @@ def angle(v1, v2):
 
     return sum(angles) / len(angles)
 
+#auteur matduf
+def calcAngleDeg(p1, p2, p3):
+    return calcAngleRad(p1, p2, p3)/m.pi*180
+
+#auteur matduf
+def calcAngleRad(p1, p2, p3):
+    return m.acos(((p2.x - p1.x) * (p3.x - p2.x) +
+                  (p2.y - p1.y) * (p3.y - p2.y) +
+                  (p2.z - p1.z) * (p3.z - p2.z))
+           / (p1.distance(p2)*p2.distance(p3)))
+
 
 class SampleTest:
     def __init__(self, pset, tolerance, angle):
@@ -43,10 +54,11 @@ class SampleTest:
             if i != 2:
                 valide = abs((distMoyen - sequence[i].distance(sequence[i+1]))/distMoyen) <= self.tolerance
             else:
-                valide = abs((distMoyen - sequence[i].distance(sequence[i + 1]/2)) / distMoyen) <= self.tolerance
+                valide = abs((distMoyen - (sequence[i].distance(sequence[i + 1])/2)) / distMoyen) <= self.tolerance
 
-            if valide:
-                #angle a implementer
+            if valide and i<3:
+                valide = calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2]) <= self.angle
+            i+=1
 
         if valide:
             candidate.points = sequence
