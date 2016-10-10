@@ -2,7 +2,14 @@ from reseau_neuronal.network import Network
 from reseau_neuronal.reseau_neural import NeuralNetwork
 from preprocessing.datamodel import LearningSet,PointSet
 from glob import glob
+<<<<<<< HEAD
 from gui.gui import gui
+=======
+from gui.interface import GUI
+
+import math
+import random
+>>>>>>> master
 
 class TestNetwork:
     def __init__(self):
@@ -27,4 +34,14 @@ class TestNetwork:
 
 #test = TestNetwork()
 
+<<<<<<< HEAD
 gui = new
+=======
+
+
+
+points = [[]]
+
+gui = GUI()
+gui.display()
+>>>>>>> master
