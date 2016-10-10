@@ -3,10 +3,10 @@ from reseau_neuronal.reseau_neural import NeuralNetwork
 from preprocessing.datamodel import LearningSet,PointSet
 from glob import glob
 from gui.interface import GUI
+from pprint import pprint
 
 import math
 import random
-import pprint
 
 tab_learning_set = []
 datafiles = glob('./datasets/points/norma_*.txt')
@@ -31,9 +31,9 @@ max_input = max([max(l) for l in matrice_input_vrais])
 min_input = min([min(l) for l in matrice_input_vrais])
 
 #On ajoute un ensemble de candidat que l'on estime faux
-matrice_input_faux = [[random.uniform(min_input, max_input) for _ in range(NeuralNetwork.nbNeuroneEntree)] for _ in range(len(matrice_input_vrais))]
+matrice_input_faux = [random.uniform(min_input, max_input) for _ in range(NeuralNetwork.nbNeuroneEntree*len(matrice_input_vrais))]
+random.shuffle(matrice_input_faux)
+#matrice_input_faux = [x for row in matrice_input_faux for x in row]
+set = list(set(matrice_input_faux))
 
-matrice_input_faux = [x for row in matrice_input_faux for x in row]
-set = set(matrice_input_faux)
-
-pprint(set)
+print(set)

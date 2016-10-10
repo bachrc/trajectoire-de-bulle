@@ -46,7 +46,7 @@ class NeuralNetwork:
         nb_neurone_sortie  = 1
 
         net = nl.net.newff(mat_neurone_entree, [nb_neurone_cachee, nb_neurone_sortie])
-        net.train(matrice_input, matrice_output, epochs=3600)
+        net.train(matrice_input, matrice_output, epochs=100000,goal=0.0001)
         net.save('network.net')
 
         self.network = net
