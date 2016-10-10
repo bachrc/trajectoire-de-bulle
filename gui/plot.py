@@ -109,6 +109,7 @@ class GUI:
                              zs=[trajectories[0][i][2], trajectories[0][i+1][2]])
 
         print(self.ax.lines)
+        p.setp(self.ax.lines, color='b')
         p.draw()
 
         print(x[ind], y[ind], z[ind])
