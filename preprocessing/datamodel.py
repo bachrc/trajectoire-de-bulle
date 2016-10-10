@@ -115,7 +115,7 @@ class LearningSet:
         self.pset = pset
         self.trajectory_file = trajectory_file
 
-    def iterate(self):
+    def iterate(self, raw_smooth=False):
         with open(self.trajectory_file) as resource:
             for line in resource:
                 point_ids = [int(i) for i in line.strip().split()]
@@ -129,4 +129,7 @@ class LearningSet:
                 d_max = max(dists)
                 dists = [d_max / 2.0 if d == d_max else d for d in dists]
 
-                yield Candidate(trajectory, max(dists)).to_standard_order()
+                candidate = Candidate(trajectory, max(dists))
+                candidate.to_standard_order()
+
+                yield candidate.raw(True) if raw_smooth else candidate

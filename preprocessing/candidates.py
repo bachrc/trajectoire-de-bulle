@@ -9,6 +9,13 @@ class Candidate:
     def __repr__(self):
         return ", ".join(p.__repr__() for p in self.points)
 
+    def __eq__(self, other):
+        return all(p in other.points for p in self.points)
+
+    def raw(self, smooth=False):
+        coords = [(p.x, p.y, p.z) for p in self.points]
+        return [c for tp in coords for c in tp] if smooth else coords
+
     def matches(self, points):
         return all(p in self.points for p in points)
 
@@ -26,7 +33,7 @@ class CandidateSearch:
         self.radius_flex = radius_flex
         self.banned_starts = set()
 
-    def iterate(self):
+    def iterate(self, raw_smooth=False):
         if self.pset is None:
             self.pset = self.pset_bak.copy()
 
@@ -74,7 +81,10 @@ class CandidateSearch:
                                 key=lambda p:
                                 p.distance_to_line(start, nearest))[:5]
 
-            yield Candidate(subset, search_radius).to_standard_order()
+            candidate = Candidate(subset, search_radius)
+            candidate.to_standard_order()
+
+            yield candidate.raw(True) if raw_smooth else candidate
 
         self.pset = None
 
