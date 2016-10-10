@@ -27,9 +27,9 @@ class Application(tk.Frame):
         if fname:
             try:
                 print("Fichier ouvert : " + fname)
-
-                # TODO: Charger le fichier, trouver les trajectoires, et afficher le plot correspondant
-
+                # TODO: Charger les données du fichier
+                # TODO: Soumettre les données du fichier à la reconnaissance des trajectoires
+                # TODO: Afficher les deux listes de données précédentes dans le matplot3d
                 self.loaded_file.config(text="Fichier chargé : {}".format(os.path.basename(str(fname))))
                 showinfo("Ouverture de fichier", "Fichier chargé avec succès !")
             except Exception as e:  # <- naked except is a bad idea
@@ -38,6 +38,7 @@ class Application(tk.Frame):
             return
 
 
-root = tk.Tk()
-app = Application(master=root)
-app.mainloop()
+def launch_gui():
+    root = tk.Tk()
+    app = Application(master=root)
+    app.mainloop()
