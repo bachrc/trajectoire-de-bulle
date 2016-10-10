@@ -53,13 +53,22 @@ class SampleTest:
         i = 0
 
         while valide and i<4:
+            passs = 1
             if i != 2:
                 valide = abs((distMoyen - sequence[i].distance(sequence[i+1]))/distMoyen) <= self.tolerance
             else:
                 valide = abs((distMoyen - (sequence[i].distance(sequence[i + 1])/2)) / distMoyen) <= self.tolerance
             if valide and i<3:
                 valide = calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2]) <= self.angle
-            i += 1
+            else:
+                print("Stop a distance %f avec moyenne %f" %(sequence[i].distance(sequence[i+1]), distMoyen) )
+                passs = 0
+
+            if valide:
+                i += 1
+            else:
+                if passs:
+                    print("Stop a angle %f" % (calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2])))
 
         if valide:
             candidate.points = sequence
@@ -94,11 +103,13 @@ class SampleTest:
         return moyenne/5
 
     def perform(self):
+        i = 0
         for candidate in self.search.iterate():
+        #    i+=1
             validation = self.validate_candidate(candidate)
             if validation is not None:
                 print(validation)
                 self.search.report_positive(candidate)
                 self.trajectories.append(validation)
-
+        #print("nb sequence : %d" % i)
 

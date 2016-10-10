@@ -6,6 +6,7 @@ from glob import glob
 if __name__ == '__main__':
     datafiles = glob('../datasets/points/norma_*.txt')
 
+
     # If you want to run a test on a small (5 points) sample, use this. The
     # points in that file DO FORM a trajectory.
     # datafiles = ["../datasets/points/valid_sample.txt"]
@@ -14,8 +15,10 @@ if __name__ == '__main__':
         tests = {}
         points = PointSet(filename)
 
-        for tolerance in range(5, 25, 5):
-            for angle in reversed(range(10, 50, 5)):
+        #for tolerance in range(5, 25, 5):
+        #    for angle in reversed(range(10, 50, 5)):
+        for tolerance in range(50, 53, 5):
+            for angle in reversed(range(30, 35, 5)):
                 test = SampleTest(points, tolerance / 100.0, angle)
                 test.perform()
 
