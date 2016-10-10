@@ -9,6 +9,9 @@ class Point:
         self.p_id = p_id
         self.x, self.y, self.z = x, y, z
 
+    def raw(self):
+        return tuple((self.x, self.y, self.z))
+
     def distance(self, point):
         # 3D shortest distance between two points.
         dx = pow(self.x - point.x, 2)
