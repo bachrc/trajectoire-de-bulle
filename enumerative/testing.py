@@ -1,3 +1,5 @@
+from builtins import print
+
 from preprocessing.candidates import CandidateSearch
 
 from itertools import permutations
@@ -55,10 +57,9 @@ class SampleTest:
                 valide = abs((distMoyen - sequence[i].distance(sequence[i+1]))/distMoyen) <= self.tolerance
             else:
                 valide = abs((distMoyen - (sequence[i].distance(sequence[i + 1])/2)) / distMoyen) <= self.tolerance
-
             if valide and i<3:
                 valide = calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2]) <= self.angle
-            i+=1
+            i += 1
 
         if valide:
             candidate.points = sequence
@@ -90,7 +91,7 @@ class SampleTest:
         moyenne = 0
         for i in range(4):
             moyenne+=sequence[i].distance(sequence[i+1])
-        return moyenne/6
+        return moyenne/5
 
     def perform(self):
         for candidate in self.search.iterate():
