@@ -82,7 +82,7 @@ class PointSet:
 
     def get_by_id(self, point_id):
         try:
-            return self.points[point_id]
+            return self.ids[point_id]
         except KeyError:
             return None
 
