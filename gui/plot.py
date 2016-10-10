@@ -1,11 +1,11 @@
 import pylab as p
 import mpl_toolkits.mplot3d.axes3d as p3
-from pprint import pprint
+from random import randint
 
 
 class GUI:
 
-    def __init__(self, bubbles, trajectories, special_bubbles=[]):
+    def __init__(self, bubbles=[], trajectories=[], special_bubbles=[]):
         """
         Méthode instanciant un affichage pour tous les points et trajectoires passés en paramètre.
 
@@ -78,6 +78,24 @@ class GUI:
                                                [bubbleTemp[2] for bubbleTemp in self.special_bubbles],
                                                c='r', marker='o', picker=5)
 
+    def hide_traj(self):
+        del self.ax.lines[:]
+        p.draw()
+
+    def display_traj(self):
+        del self.ax.lines[:]
+        for temp in self.trajectories:
+            lines = []
+            for i in range(4):
+                lines.append(self.ax.plot([temp[i][0], temp[i+1][0]],
+                                          [temp[i][1], temp[i+1][1]],
+                                          zs=[temp[i][2], temp[i+1][2]]))
+
+            color = '%06X' % randint(0, 0xFFFFFF)
+            p.setp(lines, color="#" + color)
+
+        p.draw()
+
     def display(self):
         """
         Méthode affichant les points restés en mémoire.
@@ -87,6 +105,12 @@ class GUI:
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
 
         p.show()
+
+    def close_all(self):
+        """
+        Méthode fermant toutes les instances de plot en cours.
+        """
+        p.close('all')
 
     def onpick(self, event):
         ind = event.ind[0]
@@ -102,10 +126,11 @@ class GUI:
                              [trajectories[0][i][1], trajectories[0][i+1][1]],
                              zs=[trajectories[0][i][2], trajectories[0][i+1][2]])
 
-        print(self.ax.lines)
+        # print(self.ax.lines)
+        p.setp(self.ax.lines, color='b')
         p.draw()
 
-        print(x[ind], y[ind], z[ind])
+        # print(x[ind], y[ind], z[ind])
 
 
 if __name__ == '__main__':
