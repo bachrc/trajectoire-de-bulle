@@ -3,14 +3,14 @@ import neurolab as nl
 
 class NeuralNetwork:
 
-    vrais = [1, 0]
-    faux  = [0, 1]
+    vrais = [1]
+    faux  = [0]
     nbNeuroneEntree = 15
 
     def __init__(self, matrice_input: list = None, matrice_output: list = None):
         """
         Ce constructeur entrainera le réseau en plus de le crée. Ne l'utilisez que si vous êtes sur
-        que vosu ne possèdez pas déjà un réseau dans un fichier.
+        que vous ne possèdez pas déjà un réseau dans un fichier.
         :param matrice_input: Matrice dont chaque ligne est une trajectoire à tester
         :param matrice_output: Vecteur dont chaque valeur est une sortie attendus
         """
@@ -41,9 +41,9 @@ class NeuralNetwork:
         max_input=max([max(l) for l in matrice_input])
         min_input=min([min(l) for l in matrice_input])
 
-        mat_neurone_entree = [[min_input, max_input]]*15
-        nb_neurone_cachee  = 10
-        nb_neurone_sortie  = 2
+        mat_neurone_entree = [[min_input, max_input]]*NeuralNetwork.nbNeuroneEntree
+        nb_neurone_cachee  = len(mat_neurone_entree)
+        nb_neurone_sortie  = 1
 
         net = nl.net.newff(mat_neurone_entree, [nb_neurone_cachee, nb_neurone_sortie])
         net.train(matrice_input, matrice_output, epochs=3600)
