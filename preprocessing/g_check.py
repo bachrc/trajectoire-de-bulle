@@ -1,6 +1,6 @@
 from preprocessing.datamodel import PointSet
 from preprocessing.candidates import CandidateSearch
-from gui.interface import GUI
+from gui.plot import GUI
 
 import random
 
