@@ -5,7 +5,7 @@ from pprint import pprint
 
 class GUI:
 
-    def __init__(self, bubbles, trajectories, special_bubbles=[]):
+    def __init__(self, bubbles=[], trajectories=[], special_bubbles=[]):
         """
         Méthode instanciant un affichage pour tous les points et trajectoires passés en paramètre.
 
@@ -87,6 +87,12 @@ class GUI:
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
 
         p.show()
+
+    def close_all(self):
+        """
+        Méthode fermant toutes les instances de plot en cours.
+        """
+        p.close('all')
 
     def onpick(self, event):
         ind = event.ind[0]
