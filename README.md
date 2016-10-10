@@ -23,3 +23,12 @@ EDIT 27/09/16 : Nous avons décidé de dévelloper deux approches d'identificati
 de neurone et l'autre plus analytique. Les deux approches ont pour but d'analyser un ensemble de point
 et de vérifier si celui-ci correspond à une trajectoire. C'est par l'exploration optimisé que l'on
 obtient les différents ensemble de point.
+
+## Packages utilisés
+pip8 nécessaire
+
+### via pip
+matplotlib
+
+### via apt-get
+python3-tk
