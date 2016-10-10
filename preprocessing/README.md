@@ -10,9 +10,6 @@ Ce module prend en charge le preprocessing du modèle, soit :
 Le module `datamodel` fournit la représentation d'un point, et d'un ensemble de
 points, ce dernier étant initialisé avec un fichier.
 
-**Note:** les fonctionnalités permettant de récupérer les fichiers de
-trajectoires ne sont pas encore présentes.
-
 `PointSet` fournit également deux méthodes `nearest` et `neighbours` prenant
 toutes les deux un point de référence. La recherche du plus proche retourne un
 point. La recherche des voisins prend un rayon de recherche et retourne un
@@ -28,3 +25,10 @@ candidat potentiel (voir son utilisation dans `enumerative.testing`).
 signaler tout résultat positif a la classe en appelant `report_positive` ! Peu
 importe si le résultat vient de la méthode énumérative dans `testing` ou du
 réseau de neurones !
+
+### Trajectoires connues ###
+
+`LearningSet` est l'équivalent de `CandidateSearch` pour les fichiers de 
+trajectoire. Le module génère des candidats valides, construits à partir des
+trajectoires connues. Il permet notamment d'obtenir un ensemble de positifs pour
+l'entrainement d'un réseau de neurones.
