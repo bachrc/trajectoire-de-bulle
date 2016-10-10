@@ -44,9 +44,10 @@ class SampleTest:
                 valide = abs((distMoyen - sequence[i].distance(sequence[i+1]))/distMoyen) <= self.tolerance
             else:
                 valide = abs((distMoyen - sequence[i].distance(sequence[i + 1]/2)) / distMoyen) <= self.tolerance
-
+            """
             if valide:
                 #angle a implementer
+            """
 
         if valide:
             candidate.points = sequence
