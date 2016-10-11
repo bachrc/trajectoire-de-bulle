@@ -17,9 +17,10 @@ if __name__ == '__main__':
 
         #for tolerance in range(5, 25, 5):
         #    for angle in reversed(range(10, 50, 5)):
-        for tolerance in range(50, 53, 5):
+        for tolerance in range(30, 33, 5):
             for angle in reversed(range(20, 25, 5)):
-                test = SampleTest(points, tolerance / 100.0, angle)
+                toleranceZ = 5 # absolu
+                test = SampleTest(points, tolerance / 100.0, angle, toleranceZ)
                 test.perform()
 
                 if tolerance not in tests:
