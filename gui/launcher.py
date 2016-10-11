@@ -12,11 +12,21 @@ from tkinter.messagebox import showinfo
 
 class Application(tk.Frame):
     def __init__(self, master=None):
+        """
+        Constructeur du GUI.
+
+        :param master: Le container parent.
+        """
+
         super().__init__(master)
         self.gui = GUI()
         self.create_widgets()
 
     def create_widgets(self):
+        """
+        Crée les éléments du GUI primaire.
+        """
+
         Label(self.master, text="Trajectoires de bulles", font=("fixedsys", 17))\
             .grid(row=0, sticky=W+N+E, columnspan=2, padx=15, pady=15)
 
@@ -29,6 +39,10 @@ class Application(tk.Frame):
         self.loaded_file.grid(row=2, column=1)
 
     def update_results_widgets(self):
+        """
+        S'appuie sur le GUI afin d'afficher les informations des bulles, ainsi que divers contrôles.
+        """
+
         ttk.Separator(self.master).grid(row=3, columnspan=2, sticky=E + W)
         Label(self.master, text="{} bulles chargées\n{} trajectoires trouvées"
               .format(len(self.gui.bubbles) + len(self.gui.special_bubbles), len(self.gui.trajectories)), pady=5)\
@@ -39,6 +53,9 @@ class Application(tk.Frame):
             .grid(row=5, column=1, sticky=W+E)
 
     def load_file(self):
+        """
+        Charge un fichier de données afin de démarrer le plot
+        """
         fname = askopenfilename(filetypes=(("Fichiers de résultats", "*.txt"),
                                            ("All files", "*.*")))
         if fname:
@@ -62,6 +79,10 @@ class Application(tk.Frame):
             return
 
     def load_test_values(self):
+        """
+        Chargement de quelques données de test pour affichage.
+        """
+
         bubbles = [(0, 0, 1), (1, 0, 0), (0, 2, 1), (1, 3, 0), (2, 0, 1), (3, 2, 1), (1, 2, 3), (0, 0, 0)]
         trajectories = [((0, 0, 1), (0, 2, 1), (2, 0, 1), (1, 2, 3), (3, 2, 1)),
                         ((1, 3, 0), (2, 0, 1), (3, 2, 1), (1, 2, 3), (0, 0, 0))]
@@ -73,6 +94,10 @@ class Application(tk.Frame):
 
 
 def launch_gui():
+    """
+    Méthode lançant l'application.
+    """
+
     root = tk.Tk()
     root.wm_title("Trajectoires de bulles")
     app = Application(master=root)
