@@ -12,6 +12,7 @@ class GUI:
         :param bubbles: Liste de toutes les coordonnées de bulles sous forme de tuples (x, y, z).
         :param trajectories: Liste des tuples contenant les 5 tuples de coordonnées des points à atteindre.
         """
+
         self.bubbles = bubbles
         self.special_bubbles = special_bubbles
         self.trajectories = trajectories
@@ -40,29 +41,61 @@ class GUI:
     def unspecialize_bubbles(self):
         """
         Rend normales toutes les bulles spéciales.
-        :return:
         """
 
         self.bubbles.extend(self.special_bubbles)
         del self.special_bubbles[:]
 
     def add_trajectories(self, trajectory, refresh=False):
+        """
+        Ajoute les trajectoires à la liste des trajectoires normales
+
+        :param trajectory: Liste de trajectoires à ajouter
+        :param refresh: Booléen spécifiant s'il faut actualiser le panel
+        """
+
         self.trajectories.extend(trajectory)
         if refresh:
             p.draw()
 
     def add_bubbles(self, bubble, refresh=False):
+        """
+        Ajoute les bulles à la liste des trajectoires normales
+
+        :param bubble: Liste de bulles à ajouter
+        :param refresh: Booléen spécifiant s'il faut actualiser le panel
+        """
+
         self.bubbles.extend(bubble)
         if refresh:
             p.draw()
 
     def set_bubbles(self, new_bubbles):
+        """
+        Setter des bulles
+
+        :param new_bubbles: Les bulles remplaçantes
+        """
+
         self.bubbles = new_bubbles
 
     def set_trajectories(self, new_trajectories):
+        """
+        Setter des trajectoires
+
+        :param new_trajectories: Les trajectoires remplaçantes
+        """
+
         self.trajectories = new_trajectories
 
     def update_scatters(self):
+        """
+        Met à jour les affichages de points, en fonction des points en mémoires.
+        Il y a ici deux affichages :
+        - Un affichage bleu pour les points normaux
+        - Un affichage route pour les points spéciaux à faire ressortir
+        """
+
         self.normal_scatter.remove()
         self.special_scatter.remove()
 
@@ -71,18 +104,24 @@ class GUI:
                                               [bubbleTemp[2] for bubbleTemp in self.bubbles],
                                               c='b', marker='o', picker=5)
 
-        print(self.special_bubbles)
-
         self.special_scatter = self.ax.scatter([bubbleTemp[0] for bubbleTemp in self.special_bubbles],
                                                [bubbleTemp[1] for bubbleTemp in self.special_bubbles],
                                                [bubbleTemp[2] for bubbleTemp in self.special_bubbles],
                                                c='r', marker='o', picker=5)
 
     def hide_traj(self):
+        """
+        Méthode supprimant toutes les trajectoires à l'écran
+        """
+
         del self.ax.lines[:]
         p.draw()
 
     def display_traj(self):
+        """
+        Affiche dans une couleur différente chaque trajectoire en mémoire dans le plot.
+        """
+
         del self.ax.lines[:]
         for temp in self.trajectories:
             lines = []
@@ -99,10 +138,12 @@ class GUI:
     def display(self):
         """
         Méthode affichant les points restés en mémoire.
-
         """
+
         self.update_scatters()
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
+        # FIXME: Empêcher la fermeture du plot
+        # self.fig.canvas.mpl_connect('close_event', lambda: False)
 
         p.show()
 
@@ -110,9 +151,15 @@ class GUI:
         """
         Méthode fermant toutes les instances de plot en cours.
         """
+
         p.close('all')
 
     def onpick(self, event):
+        """
+        Méthode appelée lors de la sélection d'une bulle, trace la (les ?) trajectoires comprenant la
+        bulle sélectionnée.
+        """
+
         ind = event.ind[0]
         x, y, z = event.artist._offsets3d
 
@@ -126,19 +173,5 @@ class GUI:
                              [trajectories[0][i][1], trajectories[0][i+1][1]],
                              zs=[trajectories[0][i][2], trajectories[0][i+1][2]])
 
-        # print(self.ax.lines)
         p.setp(self.ax.lines, color='b')
         p.draw()
-
-        # print(x[ind], y[ind], z[ind])
-
-
-if __name__ == '__main__':
-
-    bubbles = [(0, 0, 1), (1, 0, 0), (0, 2, 1), (1, 3, 0), (2, 0, 1), (3, 2, 1), (1, 2, 3), (0, 0, 0)]
-    trajectories = [((0, 0, 1), (0, 2, 1), (2, 0, 1), (1, 2, 3), (3, 2, 1)),
-                    ((1, 3, 0), (2, 0, 1), (3, 2, 1), (1, 2, 3), (0, 0, 0))]
-
-    gui = GUI(bubbles, trajectories)
-    gui.add_special_bubbles([(0, 2, 1), (1, 3, 0)])
-    gui.display()
