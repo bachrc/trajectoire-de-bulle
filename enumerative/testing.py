@@ -87,6 +87,7 @@ class SampleTest:
         i = 0
 
         # vérifier que la position en Z est sensiblement la même pour tous
+        #  + ou - 5 unité sur Z
         #
         #vérifier que les distances entre les points est sensiblment la même en XY
         #
