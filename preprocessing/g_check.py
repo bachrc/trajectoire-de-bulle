@@ -1,6 +1,6 @@
 from preprocessing.datamodel import PointSet
 from preprocessing.candidates import CandidateSearch
-from gui.interface import GUI
+from gui.plot import GUI
 
 import random
 
@@ -9,7 +9,7 @@ search = CandidateSearch(pset)
 gui = GUI([(p.x, p.y, p.z) for p in pset.points], [])
 
 for candidate in search.iterate():
-    gui.add_special_bubbles(((p.x, p.y, p.z) for p in candidate.points))
+    gui.add_special_bubbles(candidate.raw())
 
     # TODO: add an actual test...
     if bool(random.getrandbits(1)):

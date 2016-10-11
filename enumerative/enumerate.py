@@ -29,5 +29,5 @@ if __name__ == '__main__':
         best = tests[best_keys[0]][best_keys[1]]
 
         print("%d points, %d trajectories, best tolerance is %d%%, "
-              "best angle is %d°." % (points.size, best.score,
+              "best angle is %d°." % (points.size(), best.score,
                                       best.tolerance * 100.0, best.angle))
