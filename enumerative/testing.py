@@ -20,7 +20,7 @@ def angle(v1, v2):
 
 #auteur matduf
 def calcAngleDeg(p1, p2, p3):
-    return calcAngleRad(p1, p2, p3)/m.pi*180
+    return calcAngleRadTest(p1, p2, p3)/m.pi*180
 
 #auteur matduf
 def calcAngleRad(p1, p2, p3):
@@ -28,6 +28,37 @@ def calcAngleRad(p1, p2, p3):
                   (p2.y - p1.y) * (p3.y - p2.y) +
                   (p2.z - p1.z) * (p3.z - p2.z))
            / (p1.distance(p2)*p2.distance(p3)))
+
+def calcAngleRadTest(p1, p2, p3):
+    return min(m.acos(((p2.x - p1.x) * (p3.x - p2.x) +
+                (p2.y - p1.y) * (p3.y - p2.y))
+                 / (distanceZ(p1,p2)*distanceZ(p2,p3))),
+            m.acos(((p2.x - p1.x) * (p3.x - p2.x) +
+                 (p2.z - p1.z) * (p3.z - p2.z))
+                / (distanceY(p1,p2) * distanceY(p2,p3))),
+            m.acos(((p2.y - p1.y) * (p3.y - p2.y) +
+                    (p2.z - p1.z) * (p3.z - p2.z))
+                   / (distanceX(p1,p2) * distanceX(p2,p3)))
+                        )
+
+
+def distanceX(p1, p2):
+    # 3D shortest distance between two points.
+    dy = pow(p1.y - p2.y, 2)
+    dz = pow(p1.z - p2.z, 2)
+    return m.sqrt(dy + dz)
+
+def distanceY(p1, p2):
+    # 3D shortest distance between two points.
+    dx = pow(p1.x - p2.x, 2)
+    dz = pow(p1.z - p2.z, 2)
+    return m.sqrt(dx + dz)
+
+def distanceZ(p1, p2):
+    # 3D shortest distance between two points.
+    dx = pow(p1.x - p2.x, 2)
+    dy = pow(p1.y - p2.y, 2)
+    return m.sqrt(dx + dy)
 
 
 class SampleTest:
@@ -60,15 +91,18 @@ class SampleTest:
                 valide = abs((distMoyen - (sequence[i].distance(sequence[i + 1])/2)) / distMoyen) <= self.tolerance
             if valide and i<3:
                 valide = calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2]) <= self.angle
-            else:
-                print("Stop a distance %f avec moyenne %f" %(sequence[i].distance(sequence[i+1]), distMoyen) )
-                passs = 0
+            #else:
+            #    if i != 2:
+            #        print("Stop a distance %f avec moyenne %f, a l'iteration %d" % (sequence[i].distance(sequence[i + 1]), distMoyen, i))
+            #    else:
+            #        print("Stop a distance %f / 2 avec moyenne %f, a l'iteration %d" % (sequence[i].distance(sequence[i + 1]), distMoyen, i))
+            #    passs = 0
 
             if valide:
                 i += 1
-            else:
-                if passs:
-                    print("Stop a angle %f" % (calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2])))
+            #else:
+            #    if passs:
+            #        print("Stop a angle %f, a l'iteration %d" % (calcAngleDeg(sequence[i], sequence[i+1], sequence[i+2]), i))
 
         if valide:
             candidate.points = sequence
@@ -105,11 +139,11 @@ class SampleTest:
     def perform(self):
         i = 0
         for candidate in self.search.iterate():
-        #    i+=1
+            i+=1
             validation = self.validate_candidate(candidate)
             if validation is not None:
                 print(validation)
-                self.search.report_positive(candidate)
+                #self.search.report_positive(candidate)
                 self.trajectories.append(validation)
         #print("nb sequence : %d" % i)
 
