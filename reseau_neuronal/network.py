@@ -28,7 +28,9 @@ class Network:
             matrice_output_vrais = [NeuralNetwork.vrais] * len(matrice_input_vrais)
 
             #On ajoute un ensemble de candidat que l'on estime faux
-            matrice_input_faux = [[random.gauss(min_input, max_input) for _ in range(NeuralNetwork.nbNeuroneEntree)] for _ in range(len(matrice_input_vrais))]
+            #matrice_input_faux = [[random.gauss(min_input, max_input) for _ in range(NeuralNetwork.nbNeuroneEntree)] for _ in range(len(matrice_input_vrais))]
+            #TODO lire le fichier false.net dans trajectories (JPK doit gérer ça demain matin normalement, on le tape sinon)
+
 
             #On crée une autre matrice de réponse attendus en mettant les réponse à faux
             matrice_output_faux = [NeuralNetwork.faux] * len(matrice_input_faux)
@@ -42,8 +44,17 @@ class Network:
             random.shuffle(matrice_input, lambda: seed)
             random.shuffle(matrice_output, lambda: seed)
 
+            #with open("datasets/trajectories/false.net","w") as out:
+             #   for ligne in matrice_input_faux:
+              #      ligne_wo = [ligne[i:i + 3] for i in range(0, len(ligne), 3)]
+               #     for wo in ligne_wo:
+                #        out.write(" ".join(str(w) for w in wo) + "\n")
+
+
+
             #On créer enfin le réseau
-            self.network = NeuralNetwork(matrice_input, matrice_output)
+            #self.network = NeuralNetwork(matrice_input, matrice_output)
+
 
     def perform_all_verification(self, search_set: PointSet = None):
         if search_set is not None:
@@ -52,13 +63,9 @@ class Network:
         if self.search is None:
             raise ValueError('Aucun ensemble sur lequel rechercher')
         else:
-            fakes = [self.search.points[i:i+5] for i in range(len(self.search.points), 5)]
-            flat = [[p.raw() for p in fake] for fake in fakes]
-            print(flat)
-
             search = CandidateSearch(self.search)
             for candidat in search.iterate():
-                #print(candidat)
+                print(candidat)
                 vector = [coordonnee for point in candidat.points
                             for coordonnee in (point.x, point.y, point.z)]
                 output = self.network.use_reseau(vector)
@@ -71,3 +78,31 @@ class Network:
                     print("Faux")
                 else:
                     print("Bug")
+
+    def verifier_reseau(self, search_set: PointSet = None):
+        pts = list(search_set.points)
+        fakes = [pts[i:i + 5] for i in
+                 range(0, len(search_set.points), 5)]
+        flat = [[c for p in fake for c in p.raw()] for fake in
+                fakes]
+
+        for candidat in flat:
+            output = self.network.use_reseau(candidat)
+            reponse = [math.ceil(out) for out in output[0]]
+
+            print("candidat : ", candidat)
+
+            if reponse == NeuralNetwork.vrais:
+                print("Vrais")
+            elif reponse == NeuralNetwork.faux:
+                print("Faux")
+            else:
+                print("Bug")
+
+    def generate_false(self, search_set: PointSet, candidats_vrais: LearningSet):
+        search = CandidateSearch(self.search)
+        candidats = set([candidat for candidat in search.iterate()])
+        candidats_vrais = set([candidat for candidat in  candidats_vrais.iterate()])
+        candidats_false = candidats - candidats_vrais
+
+        return candidats_false

@@ -26,9 +26,9 @@ class TestNetwork:
             net = Network()
 
         print("valid")
-        output_mean_valid   = net.perform_all_verification(PointSet("./datasets/points/valid_sample.txt"))
+        net.verifier_reseau(PointSet("./datasets/points/valid_sample.txt"))
         print("invalid")
-        output_mean_invalid = net.perform_all_verification(PointSet("./datasets/points/pas_valid_sample.txt"))
+        net.verifier_reseau(PointSet("./datasets/points/pas_valid_sample.txt"))
 
 
-TestNetwork(input("1/ Lire le fichier \n 2/ Re-créer le réseau") == 1)
+TestNetwork(input("1/ Lire le fichier \n2/ Re-créer le réseau") == "1")
