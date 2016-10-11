@@ -17,13 +17,13 @@ class Candidate:
         self.radius = radius
 
     def __hash__(self):
-        return '-'.join(p.__hash__() for p in self.points)
+        return '-'.join(str(p.__hash__()) for p in self.points)
 
     def __eq__(self, other):
         return self.matches(other.points)
 
     def __repr__(self):
-        return ", ".join(p.__repr__() for p in self.points)
+        return ", ".join(str(p.__repr__()) for p in self.points)
 
     def matches(self, points):
         """
