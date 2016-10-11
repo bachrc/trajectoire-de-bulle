@@ -23,7 +23,7 @@ class Candidate:
         return self.matches(other.points)
 
     def __repr__(self):
-        return ", ".join(p.__repr__() for p in self.points)
+        return ", ".join(str(p.__repr__()) for p in self.points)
 
     def matches(self, points):
         """
