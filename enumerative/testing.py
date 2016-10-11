@@ -29,6 +29,8 @@ def calcAngleRad(p1, p2, p3):
                   (p2.z - p1.z) * (p3.z - p2.z))
            / (p1.distance(p2)*p2.distance(p3)))
 
+#TODO travailler sur XY uniquement
+
 def calcAngleRadTest(p1, p2, p3):
     return min(m.acos(((p2.x - p1.x) * (p3.x - p2.x) +
                 (p2.y - p1.y) * (p3.y - p2.y))
@@ -76,15 +78,23 @@ class SampleTest:
         # Determine the order of the points. Simplest solution is to select
         # the sequence which creates the shortest path when connecting the
         # dots.
-        sequence = min(permutations(candidate.points),
-                       key=lambda p: sum([p[i].distance(p[i+1])
-                                          for i in range(4)]))
+        #sequence = min(permutations(candidate.points),
+        #               key=lambda p: sum([p[i].distance(p[i+1])
+        #                                  for i in range(4)]))
+        sequence = candidate.points
         distMoyen = self.distanceMoyenne(sequence)
         valide = 1
         i = 0
 
+        # vérifier que la position en Z est sensiblement la même pour tous
+        #
+        #vérifier que les distances entre les points est sensiblment la même en XY
+        #
+        # vérifier l'angle en XY
+
         while valide and i<4:
             passs = 1
+            # TODO vérifier plus grande distance
             if i != 2:
                 valide = abs((distMoyen - sequence[i].distance(sequence[i+1]))/distMoyen) <= self.tolerance
             else:
