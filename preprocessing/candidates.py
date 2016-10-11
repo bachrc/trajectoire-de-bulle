@@ -16,6 +16,9 @@ class Candidate:
         self.points = points
         self.radius = radius
 
+    def __hash__(self):
+        return '-'.join(p.__hash__() for p in self.points)
+
     def __eq__(self, other):
         return self.matches(other.points)
 
