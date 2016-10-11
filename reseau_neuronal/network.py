@@ -100,7 +100,7 @@ class Network:
                 print("Bug")
 
     def generate_false(self, search_set: PointSet, candidats_vrais: LearningSet):
-        search = CandidateSearch(self.search)
+        search = CandidateSearch(search_set)
         candidats = set([candidat for candidat in search.iterate()])
         candidats_vrais = set([candidat for candidat in  candidats_vrais.iterate()])
         candidats_false = candidats - candidats_vrais
