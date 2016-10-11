@@ -71,8 +71,6 @@ class GUI:
                                               [bubbleTemp[2] for bubbleTemp in self.bubbles],
                                               c='b', marker='o', picker=5)
 
-        print(self.special_bubbles)
-
         self.special_scatter = self.ax.scatter([bubbleTemp[0] for bubbleTemp in self.special_bubbles],
                                                [bubbleTemp[1] for bubbleTemp in self.special_bubbles],
                                                [bubbleTemp[2] for bubbleTemp in self.special_bubbles],
@@ -103,6 +101,8 @@ class GUI:
         """
         self.update_scatters()
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
+        # FIXME: Empêcher la fermeture du plot
+        # self.fig.canvas.mpl_connect('close_event', lambda: False)
 
         p.show()
 

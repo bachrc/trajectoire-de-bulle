@@ -1,6 +1,7 @@
 import tkinter as tk
 import os
 from gui.plot import GUI
+from preprocessing.datamodel import PointSet
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -21,7 +22,7 @@ class Application(tk.Frame):
 
         ttk.Separator(self.master).grid(row=1, columnspan=2, sticky=E+W)
 
-        self.load = Button(self.master, text="Parcourir", command=self.load_test_values)
+        self.load = Button(self.master, text="Parcourir", command=self.load_file)
         self.load.grid(row=2, column=0, sticky=W+E)
 
         self.loaded_file = Label(self.master, text="Aucun fichier chargé.")
@@ -43,14 +44,21 @@ class Application(tk.Frame):
         if fname:
             try:
                 print("Fichier ouvert : " + fname)
-                # TODO: Charger les données du fichier
+                bubbles = [temp.raw() for temp in PointSet(fname).points]
                 # TODO: Soumettre les données du fichier à la reconnaissance des trajectoires
                 # TODO: Afficher les deux listes de données précédentes dans le matplot3d
                 self.loaded_file.config(text="Fichier chargé : {}".format(os.path.basename(str(fname))))
+
+                self.gui.set_bubbles(bubbles)
+                # self.gui.set_trajectories(trajectories)
+                self.update_results_widgets()
+
                 showinfo("Ouverture de fichier", "Fichier chargé avec succès !")
+
+                self.gui.display()
             except Exception as e:  # <- naked except is a bad idea
                 print(e)
-                showerror("Ouverture de fichier", "Erreur lors de l'ouverture du fichier\n{} : {}".format(fname, e))
+                showerror("Ouverture de fichier", "Erreur lors de l'ouverture du fichier {}".format(fname))
             return
 
     def load_test_values(self):
