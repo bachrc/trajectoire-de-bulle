@@ -2,9 +2,24 @@ import neurolab as nl
 
 
 class NeuralNetwork:
+    """
+    Le réseau de neurones à proprement parler, c'est cette classe à laquelle on
+    doit l'entrainement et l'utilisation du réseau
+    """
     vrais = [1]
+    """
+    La valeur que retourne le réseau en cas de succès
+    """
     faux = [0]
+    """
+    La valeur que retourne le réseau en cas d'echec
+    """
     nbNeuroneEntree = 15
+    """
+    Le nombre de neurone d'entrée dans le réseau. Sa valeur par defaut est de
+    15 et elle peut être modifier à tout moment mais cela n'aura d'impact que
+    sur le prochain entrainement du réseau.
+    !!! Il est vivement déconseillé d'agir sur ce paramètre"""
 
     def __init__(self, matrice_input: list = None, matrice_output: list = None):
         """
@@ -50,7 +65,10 @@ class NeuralNetwork:
 
         net = nl.net.newff(mat_neurone_entree, [nb_neurone_cachee,
                                                 nb_neurone_sortie])
-        net.train(matrice_input, matrice_output, epochs=100000, goal=0.0001)
+        net.trainf = nl.train.train_gdm
+        net.init()
+        net.train(matrice_input, matrice_output,
+                  epochs=999999999999999999999999, goal=0.0001)
         net.save('network.net')
 
         self.network = net
