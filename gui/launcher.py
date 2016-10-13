@@ -61,7 +61,7 @@ class Application(tk.Frame):
         Label(self.master, text="{} bulles chargées\n{} trajectoires trouvées"
               .format(len(self.gui.bubbles) + len(self.gui.special_bubbles), len(self.gui.trajectories)), pady=5)\
             .grid(row=5, columnspan=2, sticky=W)
-        Button(self.master, text="Afficher les trajectoires", command=self.gui.display_traj)\
+        Button(self.master, text="Afficher les trajectoires", command=self.display_traj)\
             .grid(row=6, column=0, sticky=W+E)
         Button(self.master, text="Cacher les trajectoires", command=self.gui.hide_traj)\
             .grid(row=6, column=1, sticky=W+E)
@@ -74,10 +74,16 @@ class Application(tk.Frame):
         """
 
         fname = askopenfilename(filetypes=(("Fichiers de résultats", "*.txt"),
-                                           ("All files", "*.*")))
+                                           ("Tous les fichiers", "*.*")))
         if fname:
             self.file = fname
+            self.loaded_file.config(text="Fichier chargé : {}".format(os.path.basename(str(self.file))))
+
         return
+
+    def display_traj(self):
+        self.gui.set_trajectories([cand.raw() for cand in self.trajectories])
+        self.gui.display_traj()
 
     def process_file_m(self):
         self.process_file(manual_mode=True)
@@ -89,7 +95,6 @@ class Application(tk.Frame):
 
             self.pointSet = PointSet(self.file)
             bubbles = [temp.raw() for temp in self.pointSet.points]
-            self.loaded_file.config(text="Fichier chargé : {}".format(os.path.basename(str(self.file))))
 
             self.gui.set_bubbles(bubbles)
 
@@ -132,8 +137,10 @@ class Application(tk.Frame):
         self.gui.display()
 
     def export(self):
-        def save_file(to_save):
-            f = asksaveasfile(mode='w', defaultextension=".txt")
+        def save_file(to_save, name=""):
+            f = asksaveasfile(mode='w', defaultextension=".txt", initialfile=name,
+                              filetypes=(("Fichiers de trajectoires", "*.txt"),
+                                         ("Tous les fichiers", "*.*")))
             if f is None:  # En cas d'annulation
                 return
 
@@ -148,13 +155,15 @@ class Application(tk.Frame):
         try:
             if self.trajectories:
                 showinfo("Exportation", "Choisissez où sauvegarder les bonnes trajectoires !")
-                save_file(self.trajectories)
+                save_file(self.trajectories, name=os.path.basename(os.path.splitext(self.file)[0]) + "_tra.txt")
             if self.bad_trajectories:
                 showinfo("Exportation", "Choisissez où sauvegarder les mauvaises trajectoires !")
-                save_file(self.bad_trajectories)
+                save_file(self.bad_trajectories, name=os.path.basename(os.path.splitext(self.file)[0]) + "_bad_tra.txt")
         except Exception as e:
             traceback.print_exc()
             showerror("Exportation", "Erreur lors de l'écriture du fichier.")
+        finally:
+            showinfo("Exportation", "Exportation terminée !")
 
     def manual_mode(self):
         # On réinitialise les trajectoires connues
