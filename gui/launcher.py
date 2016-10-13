@@ -139,7 +139,7 @@ class Application(tk.Frame):
 
             save = []
             for candidate in to_save:
-                save.append(' '.join([point.p_id for point in candidate.points]))
+                save.append(' '.join([str(point.p_id) for point in candidate.points]))
 
             text2save = '\n'.join(save)
             f.write(text2save)
@@ -147,12 +147,13 @@ class Application(tk.Frame):
 
         try:
             if self.trajectories:
-                showinfo("Exportation", "Choisissez où sauvegarder")
+                showinfo("Exportation", "Choisissez où sauvegarder les bonnes trajectoires !")
                 save_file(self.trajectories)
             if self.bad_trajectories:
-                showinfo("Exportation", "Choisissez où sauvegarder")
+                showinfo("Exportation", "Choisissez où sauvegarder les mauvaises trajectoires !")
                 save_file(self.bad_trajectories)
-        except:
+        except Exception as e:
+            traceback.print_exc()
             showerror("Exportation", "Erreur lors de l'écriture du fichier.")
 
     def manual_mode(self):
@@ -164,12 +165,14 @@ class Application(tk.Frame):
 
         for trajectory in cs.iterate():
             self.gui.hide_traj()
+            self.gui.delete_trajs()
             self.gui.unspecialize_bubbles()
             self.gui.add_trajectories(trajectory.raw())
             print(self.gui.trajectories)
-            self.gui.display_traj()
+            self.gui.display_traj(same_color="FF0000")
 
-            if messagebox.askyesno("Analyse des trajectoires", "Est-ce une trajectoire valide ?", icon=messagebox.QUESTION):
+            if messagebox.askyesno("Analyse des trajectoires", "Est-ce une trajectoire valide ?",
+                                   icon=messagebox.QUESTION):
                 self.trajectories.append(trajectory)
             else:
                 self.bad_trajectories.append(trajectory)

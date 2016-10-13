@@ -117,7 +117,7 @@ class GUI:
         del self.ax.lines[:]
         p.draw()
 
-    def display_traj(self):
+    def display_traj(self, same_color=None):
         """
         Affiche dans une couleur différente chaque trajectoire en mémoire dans le plot.
         """
@@ -130,10 +130,17 @@ class GUI:
                                           [temp[i][1], temp[i+1][1]],
                                           zs=[temp[i][2], temp[i+1][2]]))
 
-            color = '%06X' % randint(0, 0xFFFFFF)
+            if same_color is None:
+                color = '%06X' % randint(0, 0xFFFFFF)
+            else:
+                color = same_color
+
             p.setp(lines, color="#" + color)
 
         p.draw()
+
+    def delete_trajs(self):
+        del self.trajectories[:]
 
     def display(self):
         """
