@@ -65,7 +65,7 @@ class NeuralNetwork:
 
         net = nl.net.newff(mat_neurone_entree, [nb_neurone_cachee,
                                                 nb_neurone_sortie])
-        net.trainf = nl.train.train_gdm
+        #net.trainf = nl.train.train_gdm
         net.init()
         net.train(matrice_input, matrice_output,
                   epochs=999999999999999999999999, goal=0.0001)

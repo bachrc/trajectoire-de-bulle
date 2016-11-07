@@ -4,7 +4,7 @@ from glob import glob
 
 
 class InitNetwork:
-    def __init__(self, need_to_train):
+    def __init__(self, need_to_train, directory):
         """
         Permet d'initialiser un réseau et de l'entrainer sur tout nos fichier
         de données. Il est également possible de lire le fichier décrivant le
@@ -19,14 +19,14 @@ class InitNetwork:
             tab_learning_set_false = []
 
             # Lecture des fichiers
-            datafiles = glob('./datasets/points/norma_*.txt')
+            datafiles = glob(directory+'/points/norma_*.txt')
 
             for filename in datafiles:
                 print(filename)
                 basename = filename[filename.rindex('/') + 1:-4]
-                tra_file_true = "./datasets/trajectories/%s_tra.txt" \
+                tra_file_true = (directory+"/trajectories/%s_tra.txt") \
                                 % basename
-                tra_file_false = "./datasets/trajectories/%s_tra_false.txt" \
+                tra_file_false = (directory+"/trajectories/%s_tra_false.txt") \
                                  % basename
 
                 # On créer l'ensemble des points à partir
@@ -44,12 +44,12 @@ class InitNetwork:
         else:
             # On initalise le réseau avec le fichier network.net
             net = Network()
-
-        # On teste le réseau
-        print("valid")
-        net.verifier_reseau(PointSet("./datasets/points/valid_sample.txt"))
-        print("invalid")
-        net.verifier_reseau(PointSet("./datasets/points/pas_valid_sample.txt"))
-
-
-InitNetwork(input("1/ Lire le fichier \n2/ Re-créer le réseau\n") != "1")
+            datafiles = glob(directory+"/points/norma_*.txt")
+            for filename in datafiles:
+                print(filename)
+                pset = PointSet(filename)
+                res = net.perform_all_verification(pset)
+                basename = filename[filename.rindex('/') + 1:-4]
+                with open((directory+"/trajectories/%s_tra.txt") % basename, "r") as fileOut:
+                    for val in res:
+                        fileOut.write(res+"\n")
