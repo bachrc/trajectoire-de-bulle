@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from tkinter.filedialog import askdirectory
 from reseau_neuronal.init_network import InitNetwork
 
