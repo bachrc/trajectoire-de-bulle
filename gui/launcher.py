@@ -4,13 +4,16 @@ import traceback
 from gui.plot import GUI
 from preprocessing.datamodel import PointSet
 from preprocessing.candidates import CandidateSearch
+from reseau_neuronal import init_network
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter.filedialog import asksaveasfile
 from tkinter.messagebox import showerror
 from tkinter.messagebox import showinfo
+
+from reseau_neuronal.generate_false import generate_false
 
 
 class Application(tk.Frame):
@@ -43,7 +46,7 @@ class Application(tk.Frame):
         self.load.grid(row=2, column=0, sticky=W+E)
 
         self.loaded_file = Label(self.master, text="Aucun fichier chargé.")
-        self.loaded_file.grid(row=2, column=1)
+        self.loaded_file.grid(row=2, column=1, columnspan=2)
 
         self.process_auto = Button(self.master, text="Recherche automatique", command=self.process_file)
         self.process_auto.grid(row=3, sticky=W + E)
@@ -51,6 +54,10 @@ class Application(tk.Frame):
         self.process_manual = Button(self.master, text="Recherche manuelle",
                                      command=self.process_file_m)
         self.process_manual.grid(row=3, column=1, sticky=W + E)
+
+        self.process_training = Button(self.master, text="Entrainement",
+                                       command=self.process_training)
+        self.process_training.grid(row=3, column=2, sticky=W + E)
 
     def update_results_widgets(self):
         """
@@ -88,23 +95,29 @@ class Application(tk.Frame):
     def process_file_m(self):
         self.process_file(manual_mode=True)
 
-    def process_file(self, find_trajectories=True, manual_mode=False):
+    def process_training(self):
+        fname = askdirectory(mustexist=True, title="Choose a directory with trajectory and points files")
+        generate_false(fname)
+        self.process_file(training=True, file_train=fname)
+
+    def process_file(self, find_trajectories=True, manual_mode=False, training=False, file_train=None):
         try:
-            if self.file is None:
+            if self.file is None and file_train is None:
                 raise ValueError("Aucun fichier chargé.")
 
             self.pointSet = PointSet(self.file)
             bubbles = [temp.raw() for temp in self.pointSet.points]
 
-            self.gui.set_bubbles(bubbles)
-
             if find_trajectories:
-                # TODO: Soumettre les données du fichier à la reconnaissance des trajectoires
-                print("Trajectoires à définir..")
-                # self.gui.set_trajectories(trajectories)
+                reseau = init_network.InitNetwork(training, self.file if file_train is None else file_train)
+                if file_train is not None:
+                    return
 
-            # TODO: Afficher les deux listes de données précédentes dans le matplot3d
+                self.trajectories = reseau.getResult()
+                print(self.trajectories)
+                self.gui.set_trajectories([candidat.raw() for candidat in self.trajectories])
 
+            self.gui.set_bubbles(bubbles)
             self.update_results_widgets()
 
             showinfo("Ouverture de fichier", "Fichier chargé avec succès !")
